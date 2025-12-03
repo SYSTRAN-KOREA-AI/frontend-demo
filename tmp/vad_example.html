@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web Audio VAD Example</title>
+</head>
+<body>
+<h1>Voice Activity Detection (VAD) Example</h1>
+<button id="startButton">Start VAD</button>
+<div id="status">Status: Not started</div>
+
+<script>
+  // VAD 파라미터
+  const VAD_THRESHOLD = 0.05; // 음성 감지 임계값 (0.0 ~ 1.0)
+  const SILENCE_DURATION = 10000; // 음성 종료 후 대기 시간 (ms)
+
+  let audioContext;
+  let analyser;
+  let mediaStreamSource;
+  let lastVoiceTime = 0;
+  let isSpeaking = false;
+
+  document.getElementById('startButton').addEventListener('click', () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          handleMicStream(stream);
+          document.getElementById('status').innerText = 'Status: VAD started';
+        })
+        .catch(error => {
+          console.error('Error accessing microphone:', error);
+          document.getElementById('status').innerText = 'Status: Error accessing microphone';
+        });
+    } else {
+      alert('Your browser does not support getUserMedia.');
+    }
+  });
+
+  function handleMicStream(stream) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    mediaStreamSource = audioContext.createMediaStreamSource(stream);
+
+    // 오디오 그래프 연결
+    mediaStreamSource.connect(analyser);
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    // 음성 데이터 분석 루프
+    const processAudio = () => {
+      analyser.getByteTimeDomainData(dataArray);
+
+      let sumSquares = 0.0;
+      for (const amplitude of dataArray) {
+        const normalized = amplitude / 128.0 - 1.0;
+        sumSquares += normalized * normalized;
+      }
+      const rms = Math.sqrt(sumSquares / dataArray.length);
+
+      // 음성 감지 로직
+      if (rms > VAD_THRESHOLD) {
+        if (!isSpeaking) {
+          console.log('Voice started!');
+          isSpeaking = true;
+        }
+        lastVoiceTime = Date.now();
+      } else {
+        const silenceDuration = Date.now() - lastVoiceTime;
+        if (isSpeaking && silenceDuration > SILENCE_DURATION) {
+          console.log('Voice stopped!');
+          isSpeaking = false;
+          // 음성 종료 이벤트 발생 (예: WebSocket을 통해 서버에 알림)
+          // ws.send(JSON.stringify({ type: 'voice_stop' }));
+        }
+      }
+
+      // 다음 프레임 요청
+      requestAnimationFrame(processAudio);
+    };
+
+    processAudio();
+  }
+</script>
+</body>
+</html>
