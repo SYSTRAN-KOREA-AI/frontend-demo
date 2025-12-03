@@ -1,0 +1,25 @@
+name: Demo React Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      server:
+        description: "배포할 서버 선택"
+        required: true
+        type: choice
+        options: ["27", "26", "195"]
+
+jobs:
+  call_react_deploy_template:
+    uses: SYSTRAN-KOREA-AI/.github/.github/workflows/deploy-react-template.yml@main
+    with:
+      SERVICE_NAME: demo-react
+      TARGET_REMOTE_PATH: /opt/business_meeting/nginx/dist
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }} # Not strictly needed for frontend, but keeping for consistency if template expects it
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}     # Not strictly needed for frontend, but keeping for consistency if template expects it
+      ENV_FILE: ${{ secrets.REACT_DEMO_ENV_FILE }} # This secret will hold the .env content
+      PREFIX_HOST: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_HOST || github.event.inputs.server == '26' && secrets.SERVER_26_HOST || secrets.SERVER_27_HOST }}
+      PREFIX_PORT: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_PORT || github.event.inputs.server == '26' && secrets.SERVER_26_HOST || secrets.SERVER_27_PORT }}
+      PREFIX_USER: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_USER || github.event.inputs.server == '26' && secrets.SERVER_26_USER || secrets.SERVER_27_USER }}
+      BASE64_KEY: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_KEY || github.event.inputs.server == '26' && secrets.SERVER_26_KEY || secrets.SERVER_27_KEY }}
