@@ -18,7 +18,7 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }} # Not strictly needed for frontend, but keeping for consistency if template expects it
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}     # Not strictly needed for frontend, but keeping for consistency if template expects it
-      ENV_FILE: ${{ secrets.REACT_DEMO_ENV_FILE }} # This secret will hold the .env content
+      ENV_FILE: ${{ secrets.REACT_ENV_FILE }} # This secret will hold the .env content
       PREFIX_HOST: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_HOST || github.event.inputs.server == '26' && secrets.SERVER_26_HOST || secrets.SERVER_27_HOST }}
       PREFIX_PORT: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_PORT || github.event.inputs.server == '26' && secrets.SERVER_26_HOST || secrets.SERVER_27_PORT }}
       PREFIX_USER: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_USER || github.event.inputs.server == '26' && secrets.SERVER_26_USER || secrets.SERVER_27_USER }}
