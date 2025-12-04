@@ -14,7 +14,7 @@ jobs:
     uses: SYSTRAN-KOREA-AI/.github/.github/workflows/deploy-react-template.yml@main
     with:
       SERVICE_NAME: frontend-demo
-      TARGET_REMOTE_PATH: /opt/business_meeting/nginx/dist
+      BASE_REMOTE_PATH: /opt/business_meeting
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }} # Not strictly needed for frontend, but keeping for consistency if template expects it
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}     # Not strictly needed for frontend, but keeping for consistency if template expects it
