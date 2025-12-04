@@ -15,9 +15,13 @@ jobs:
     with:
       SERVICE_NAME: frontend-demo
       BASE_REMOTE_PATH: /opt/business_meeting
+      PROFILE: ${{ (github.event.inputs.server == '27' && 'dev') || (github.event.inputs.server == '26' && 'stage') || (github.event.inputs.server == '195' && 'prod') }}
     secrets:
-      ENV_FILE: ${{ secrets.REACT_ENV_FILE }}
+      # Pass all potential config secrets for each environment
+      ENV_DEV_FILE: ${{ secrets.ENV_DEV_FILE }}
+      ENV_STAGE_FILE: ${{ secrets.ENV_STAGE_FILE }}
+      ENV_PROD_FILE: ${{ secrets.ENV_PROD_FILE }}
       PREFIX_HOST: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_HOST || github.event.inputs.server == '26' && secrets.SERVER_26_HOST || secrets.SERVER_27_HOST }}
-      PREFIX_PORT: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_PORT || github.event.inputs.server == '26' && secrets.SERVER_26_HOST || secrets.SERVER_27_PORT }}
+      PREFIX_PORT: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_PORT || github.event.inputs.server == '26' && secrets.SERVER_26_PORT || secrets.SERVER_27_PORT }}
       PREFIX_USER: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_USER || github.event.inputs.server == '26' && secrets.SERVER_26_USER || secrets.SERVER_27_USER }}
       BASE64_KEY: ${{ github.event.inputs.server == '195' && secrets.SERVER_195_KEY || github.event.inputs.server == '26' && secrets.SERVER_26_KEY || secrets.SERVER_27_KEY }}
